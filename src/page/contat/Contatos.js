@@ -55,22 +55,17 @@ const Contatos = () => {
   }, []);
 
   useEffect(() => {
-    // alert("entrou")
+   // alert("entrou")
     Axios.get(
-      "https://9da0-2804-7d74-8b-a900-f1d0-4ad6-be7d-b5b8.ngrok-free.app/test",
+      "https://api-chat-android.vercel.app/test",
       {
         params: {
           currentTalk: idUser,
         },
       }
-    )
-      .then((response) => {
-        console.log(
-          "resposta da solicitação do banco de dados",
-          response.data.result
-        );
-      })
-      .catch((error) => console.log(error));
+    ).then((response) => {
+      console.log("resposta da solicitação do banco de dados", response.data.result);
+    }).catch((err)=>console.log(err));
     if (name && email) {
       //addContatcLocalStorage()
 
@@ -82,12 +77,12 @@ const Contatos = () => {
         .catch((error) => console.log("Erro ao armazenar usuários: ", error));
     }
     //console.log(listUser);
-  }, [listUser, idUser]);
+  }, [listUser,idUser]);
 
   const addContatcLocalStorage = () => {
     if (name && email) {
       Axios.get(
-        "https://9da0-2804-7d74-8b-a900-f1d0-4ad6-be7d-b5b8.ngrok-free.app/verificContact",
+        "https://api-chat-android.vercel.app/verificContact",
         {
           params: {
             email,
@@ -95,10 +90,10 @@ const Contatos = () => {
         }
       ).then((response) => {
         //console.log(response.data);
-        if (response.data.length > 0) {
+        if (true) {
           //console.log(contatc.idTalk=response?.data?.id);
-          if (listUser?.some((item) => item.email === contatc.email)) {
-            alert("Email já existe na lista!");
+          if (true /*listUser?.some((item) => item.email === contatc.email)*/) {
+            //alert("Email já existe na lista!");
             //return;
           }
           const newArray = response?.data?.reduce((acumulador, atual) => {
@@ -107,11 +102,14 @@ const Contatos = () => {
           console.log("novo araray: ", newArray);
           setListUser([...listUser, newArray]);
           setIdUser(newArray?.id);
+          if(response.data.length>0){
+            setModalVisible(false);
+          }
           //setModalVisible(false);
           console.log("teste porra: ", listUser);
-          alert(newArray.id);
+          alert("Usuario adicionado");
         }
-      }).catch(error => console.log(error));
+      }).catch((err)=>console.log(err));
       console.log("id do usuario: " + idUser);
     }
   };
@@ -147,11 +145,13 @@ const Contatos = () => {
             style={{
               backgroundColor: "white",
               width: "87%",
-              height: "35%",
+              height: 350,
               minWidth: "87%",
               borderRadius: 5,
               padding: 20,
               alignItems: "center",
+              justifyContent:"center",
+              bottom:50
             }}
           >
             <Text>Informações de Contatos id:{idUser}</Text>
@@ -161,11 +161,11 @@ const Contatos = () => {
               placeholder="Nome"
               style={{
                 width: "90%",
-                borderWidth: 2,
+                borderWidth: 1,
                 padding: 5,
                 borderRadius: 5,
-                borderColor: "orange",
-                fontSize: 20,
+                borderColor: "#5ed3e0",
+                fontSize: 28,
                 marginTop: 25,
               }}
             />
@@ -175,11 +175,11 @@ const Contatos = () => {
               placeholder="Email"
               style={{
                 width: "90%",
-                borderWidth: 2,
+                borderWidth: 1,
                 padding: 5,
                 borderRadius: 5,
-                borderColor: "orange",
-                fontSize: 20,
+                borderColor: "#5ed3e0",
+                fontSize: 28,
                 marginTop: 5,
                 marginBottom: 10,
               }}
@@ -187,6 +187,7 @@ const Contatos = () => {
             <Button
               onPress={() => {
                 addContatcLocalStorage();
+               
                 //alert(name + email)
               }}
               title="Salvar Contato"
@@ -239,8 +240,44 @@ const Contatos = () => {
             >
               <Text style={[style.text, { color: "green" }]}>Novo contato</Text>
             </View>
+            
           </Pressable>
-          {listUser?.map((item, id) => (
+          <Pressable
+            style={{
+              height: 65,
+              flex: 1,
+              width: "100%",
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              gap: 15,
+              left: 5,
+              marginTop: 2,
+            }}
+          >
+            <View
+              style={{
+                borderWidth: 0,
+                borderColor: "white",
+                borderRadius: 60,
+                padding: 4,
+                flexDirection: "column",
+              }}
+            >
+              <FontAwesome name="user-plus" size={32} color="red" />
+            </View>
+            <View
+              onTouchEnd={() => {
+               AsyncStorage.removeItem("contacsLocal");
+               setListUser("")
+              }}
+              style={{ alignItems: "flex-start", gap: 0 }}
+            >
+              <Text style={[style.text, { color: "red" }]}>Apagar contatos</Text>
+            </View>
+            
+          </Pressable>
+          {listUser.length ? listUser?.map((item, id) => (
             <Pressable key={id} style={style.presable}>
               <Image
                 style={style.logo}
@@ -250,11 +287,11 @@ const Contatos = () => {
               />
               <View style={{ alignItems: "flex-start", gap: 0 }}>
                 <Text style={style.text}>
-                  {item.name} - {item.id}
+                  {item.name} - ID:{item.id}
                 </Text>
               </View>
             </Pressable>
-          ))}
+          )):false}
         </View>
       </ScrollView>
     </View>

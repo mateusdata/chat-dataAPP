@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import {
   Button,
   Image,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,7 +17,7 @@ import {
   Montserrat_500Medium,
 } from "@expo-google-fonts/montserrat";
 import { Roboto_300Light } from "@expo-google-fonts/roboto";
-import { useNavigation } from "@react-navigation/native";
+import { Link, useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const Home = () => {
@@ -53,7 +54,7 @@ const Home = () => {
   return (
     <View  style={style.main}>
       <ScrollView onTouchStart={()=>setIsMenu(false)} style={{ flex: 1, borderWidth: 0, width: "100%" }}>
-        {listUser.map((item, id) => (
+        {listUser.length > 0 ? listUser?.map((item, id) => (
           <Pressable
             key={id}
             style={style.presable}
@@ -90,7 +91,7 @@ const Home = () => {
               05:58
             </Text>
           </Pressable>
-        ))}
+        )): false}
       </ScrollView>
       <Pressable
         onPress={() => navigate.navigate("Contatos")}
@@ -112,6 +113,8 @@ const Home = () => {
           color="white"
         />
       </Pressable>
+
+      {false && <Button title="abrir navegador" onPress={()=> Linking.openURL('https://www.example.com')}/>}
     </View>
   );
 };
