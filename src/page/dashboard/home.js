@@ -20,11 +20,12 @@ import { Roboto_300Light } from "@expo-google-fonts/roboto";
 import { Link, useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingComponent from "../../components/loading/loading";
 const Home = () => {
   const { sair } = useContext(Context);
   const navigate = useNavigation();
   const { listUser, setListUser } = useContext(Context);
-  const {currentTalk, setCurrentTalk, nameFriend,setNameFriend, setIsMenu} = useContext(Context)
+  const {currentTalk, setCurrentTalk, nameFriend,setNameFriend, setIsMenu, setMydata, emailFriend, setEmailFriend} = useContext(Context)
   const [fontLoaded] = useFonts({
     Montserrat_300Light,
     Montserrat_600SemiBold,
@@ -32,9 +33,14 @@ const Home = () => {
     Roboto_300Light,
   });
   useEffect(() => {
+    AsyncStorage.getItem("myData").then((r)=>{
+      //console.log("meud dados", r);
+      setMydata(JSON.parse(r))
+
+    })
     AsyncStorage.getItem("contacsLocal")
       .then((response) => {
-        console.log("dados", JSON.parse(response));
+        //console.log("dados", JSON.parse(response));
         if (response !== null) {
           setListUser(JSON.parse(response));
         }
@@ -42,13 +48,11 @@ const Home = () => {
       .catch((error) => {
         console.log(error);
       });
-    console.log(listUser);
+    //console.log(listUser);
   }, []);
   if (!fontLoaded) {
     return (
-      <View style={{ alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ fontSize: 30 }}>Carregando</Text>
-      </View>
+      <LoadingComponent/>
     );
   }
   return (
@@ -59,10 +63,11 @@ const Home = () => {
             key={id}
             style={style.presable}
             onPress={() => {
-              navigate.navigate("test");
-              setCurrentTalk(item.id)
+             navigate.navigate("test");
+              setCurrentTalk(item.id) 
               setNameFriend(item.name)
-              //alert(item.name)
+              setEmailFriend(item.email)
+              //alert(emailFriend)
             }}
           >
             <Image
@@ -76,10 +81,10 @@ const Home = () => {
               <Text
                 style={[
                   style.text,
-                  { fontSize: 17, color: "grey", fontWeight: "300" },
+                  { fontSize: 17, color: "green", fontWeight: "300" },
                 ]}
               >
-                oi iai Lorena silva ...
+                Novas Mensagem...
               </Text>
             </View>
             <Text
@@ -96,7 +101,7 @@ const Home = () => {
       <Pressable
         onPress={() => navigate.navigate("Contatos")}
         style={{
-          backgroundColor: "green",
+          backgroundColor: "#237243",
           borderRadius: 50,
           position: "absolute",
           top: "90%",
@@ -127,6 +132,8 @@ const style = StyleSheet.create({
     justifyContent: "flex-start",
     backgroundColor: "white",
     padding: 0,
+    backgroundColor: "rgba(233, 229, 229, 0.486)"
+    
   },
   presable: {
     height: 70,

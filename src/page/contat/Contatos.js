@@ -29,7 +29,8 @@ const Contatos = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const { listUser, setListUser } = useContext(Context);
+  const { listUser, setListUser,sair, myData } = useContext(Context);
+  const [erro, setErro] = useState('');
   //const {currentTalk, seturrentTalk} = useContext(Context)
   let [idUser, setIdUser] = useState();
   const [fontLoaded] = useFonts({
@@ -40,6 +41,8 @@ const Contatos = () => {
   });
 
   useEffect(() => {
+    //alert(myData.myId.toString() + idUser.toString())
+    //console.log("usuarios: ",listUser.some((obj)=> obj.email==="a@a.aa"))
     AsyncStorage.getItem("contacsLocal")
       // setListUser("")
       .then((response) => {
@@ -60,15 +63,15 @@ const Contatos = () => {
       "https://api-chat-android.vercel.app/test",
       {
         params: {
-          currentTalk: idUser,
+          currentTatlk: myData?.myId < idUser ? myData?.myId.toString() + idUser?.toString():idUser?.toString()+myData?.myId?.toString()
+            
         },
       }
     ).then((response) => {
-      console.log("resposta da solicitação do banco de dados", response.data.result);
+      //console.log("resposta da solicitação do banco de dados", response.data.result);
     }).catch((err)=>console.log(err));
     if (name && email) {
       //addContatcLocalStorage()
-
       AsyncStorage.setItem("contacsLocal", JSON.stringify(listUser))
         .then(() => {
           //console.log("Usuários armazenados com sucesso!");
@@ -80,7 +83,7 @@ const Contatos = () => {
   }, [listUser,idUser]);
 
   const addContatcLocalStorage = () => {
-    if (name && email) {
+    if (name && email && !listUser.some((obj)=> obj.email===email)) {
       Axios.get(
         "https://api-chat-android.vercel.app/verificContact",
         {
@@ -107,11 +110,13 @@ const Contatos = () => {
           }
           //setModalVisible(false);
           console.log("teste porra: ", listUser);
-          alert("Usuario adicionado");
+          //alert("Usuario adicionado");
         }
       }).catch((err)=>console.log(err));
       console.log("id do usuario: " + idUser);
+      return;
     }
+    setErro("Erro, insira valores validos:")
   };
   if (!fontLoaded) {
     return (
@@ -154,7 +159,7 @@ const Contatos = () => {
               bottom:50
             }}
           >
-            <Text>Informações de Contatos id:{idUser}</Text>
+            <Text style={{fontSize:25, fontWeight:800}}>Novo contato</Text>
             <TextInput
               value={name}
               onChangeText={(e) => setName(e)}
@@ -192,7 +197,9 @@ const Contatos = () => {
               }}
               title="Salvar Contato"
             />
+            <Text style={{color:"red", top:5}}>{erro}</Text>
           </View>
+          
         </View>
       </Modal>
 
@@ -268,8 +275,7 @@ const Contatos = () => {
             </View>
             <View
               onTouchEnd={() => {
-               AsyncStorage.removeItem("contacsLocal");
-               setListUser("")
+                sair()
               }}
               style={{ alignItems: "flex-start", gap: 0 }}
             >

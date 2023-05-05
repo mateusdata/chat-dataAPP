@@ -1,29 +1,63 @@
+import axios from "axios";
 import { Context } from "../../context/contexto";
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FormPage = () => {
-  const [name, setName] = useState('');
+  const [myNome, setMyNome] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
-  const {logar} = useContext(Context)      
+  const [senha, setSenha] = useState('');
+  const [fazerLogin, setFazerLogin] = useState(true);
+  const [erro,setErro]= useState("")
+  const {logar} = useContext(Context);
+  useEffect(()=>{
+
+  },[]) 
   const handleRegister = () => {
     // Fazer o cadastro aqui
-    console.log(name, email, password);
+   // console.log(nome, email, senha);
   };
   const handleLogin = () => {
-    logar();
+   // logar(email, nome);
+   //alert( email + senha)
+   
+    if (email && senha) {
+      axios.post("https://api-chat-android.vercel.app/login", {
+        email,
+        senha,
+      }).then((response) => {
+        //console.log(response.data);
+        setErro(JSON.stringify(response.data.erroStatus));
+        if (response.data.erroStatus===true) {
+          //setReq(response.data)
+         // logar();
+          setMyNome(response.data.name)
+          //alert(nome)
+          console.log({nome:response.data.newName, myId:response.data.myId});
+          //setData({nome:response.data.name, myId:response.data.myId})
+          AsyncStorage.setItem("myData", JSON.stringify({nome:response?.data?.newName, myId:response?.data?.myId,myEmail:response?.data?.myEmail})).then((r)=>{
+            console.log(r);
+            logar()
+          })
+        }
+
+      }).catch((error) => {
+        console.error(error);
+      });
+      return;
+    }
+   
   };
 
   const handleLogin2 = () => {
     // Fazer o login aqui
-    console.log(email, password);
+    console.log(email, senha);
   };
 
   const toggleForm = () => {
-    setIsLogin(!isLogin);
+    setFazerLogin(!fazerLogin);
   };
 
   return (
@@ -33,13 +67,13 @@ const FormPage = () => {
         backgroundColor='#1F2C34'
         barStyle='light-content'
       />
-      <Text style={styles.header}>{isLogin ? 'Login' : 'Cadastro'}</Text>
-      {!isLogin && (
+      <Text style={styles.header}>{fazerLogin ? 'Login' : 'Cadastro'}</Text>
+      {!fazerLogin && (
         <TextInput
           style={styles.input}
           placeholder="Nome"
-          value={name}
-          onChangeText={(text) => setName(text)}
+          value={myNome}
+          onChangeText={(text) => setMyNome(text)}
         />
       )}
       <TextInput
@@ -52,20 +86,21 @@ const FormPage = () => {
         style={styles.input}
         placeholder="Senha"
         secureTextEntry
-        value={password}
-        onChangeText={(text) => setPassword(text)}
+        value={senha}
+        onChangeText={(text) => setSenha(text)}
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={isLogin ? handleLogin : handleRegister}
+        onPress={fazerLogin ? handleLogin : handleRegister}
       >
-        <Text style={styles.buttonText}>{isLogin ? 'Entrar' : 'Cadastrar'}</Text>
+        <Text style={styles.buttonText}>{fazerLogin ? 'Entrar' : 'Cadastrar'}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={toggleForm}>
         <Text style={styles.toggleText}>
-          {isLogin ? 'Ainda não tem uma conta? Cadastre-se aqui.' : 'Já tem uma conta? Faça login aqui.'}
+          {fazerLogin ? 'Ainda não tem uma conta? Cadastre-se aqui.' : 'Já tem uma conta? Faça login aqui.'}
         </Text>
       </TouchableOpacity>
+      {fazerLogin && <Text style={{color:"red", fontSize:30}}>{erro}</Text>}
     </View>
   );
 };

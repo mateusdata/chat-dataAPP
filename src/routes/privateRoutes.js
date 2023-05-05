@@ -20,12 +20,14 @@ import Contatos from "../page/contat/Contatos";
 import { Context } from "../context/contexto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import Status from "../page/status/status";
+import Users from "../page/users/users";
 const Tab = createBottomTabNavigator();
 //const Tab = createMaterialTopTabNavigator();
 const AppStack = createStackNavigator();
 const PrivateRoutes = () => {
   const { nameFriend } = useContext(Context);
-  const { isMenu, setIsMenu , sair} = useContext(Context);
+  const { isMenu, setIsMenu , sair,setListUser} = useContext(Context);
   const navigation = useNavigation()
   const [fontLoaded] = useFonts({
     Montserrat_300Light,
@@ -103,7 +105,7 @@ const PrivateRoutes = () => {
                 },
                 headerShown: true,
                 headerStyle: {
-                  backgroundColor: "#006d7e",
+                  backgroundColor: "#075E54",
                 },
                 headerTintColor: "white",
                 headerRight: () => (
@@ -112,8 +114,9 @@ const PrivateRoutes = () => {
                       <SimpleLineIcons
                         onTouchEnd={() => setIsMenu(!isMenu)}
                         name="options-vertical"
-                        size={22}
+                        size={18}
                         color="#b9bdbf"
+                        style={{right:5, padding:10}}
                       />
                     ) : (
                       <View style={{ flex: 1 }}>
@@ -121,48 +124,49 @@ const PrivateRoutes = () => {
                           onPress={() => {
                             setIsMenu(!isMenu);
                           }}
-                          style={{ backgroundColor: "pink" }}
+                          style={{ backgroundColor: "white" }}
                           title="Opções"
                         />
                         <Menu.Item
                           leadingIcon="email"
                           onPress={() => {navigation.navigate("Contatos")}}
-                          style={{ backgroundColor: "pink" }}
+                          style={{ backgroundColor: "white" }}
                           title="Contatos do email"
                         />
                         <Menu.Item
                           leadingIcon="city"
                           onPress={() => {}}
-                          style={{ backgroundColor: "pink" }}
+                          style={{ backgroundColor: "white" }}
                           title="Dark-theme"
                         />
                         <Menu.Item
                           leadingIcon="content-cut"
                           onPress={() => {}}
-                          style={{ backgroundColor: "pink" }}
+                          style={{ backgroundColor: "white" }}
                           title="Colar"
                           disabled
                         />
                         <Menu.Item
                           leadingIcon="content-copy"
                           onPress={() => {}}
-                          style={{ backgroundColor: "pink" }}
+                          style={{ backgroundColor: "white" }}
                           title="Copiar"
                           disabled
                         />
                         <Menu.Item
-                          leadingIcon="content-paste"
-                          onPress={() => {}}
-                          style={{ backgroundColor: "pink" }}
-                          title="Pasta"
+                          leadingIcon="delete"
+                          onPress={() => {AsyncStorage.removeItem("contacsLocal"); setListUser("");}}
+                          style={{ backgroundColor: "white" }}
+                          title="Limpar conversas"
                         />
                         <Menu.Item
                           leadingIcon="logout"
                           onPress={() => {
                             setIsMenu(false)
-                            sair();
+                            sair()
+
                           }}
-                          style={{ backgroundColor: "#f76f83" }}
+                          style={{ backgroundColor: "rgb(211, 205, 205)" }}
                           title="Sair"
                         />
                       </View>
@@ -181,8 +185,8 @@ const PrivateRoutes = () => {
                 }}
               />
               <Tab.Screen
-                name="Amigos"
-                component={Home}
+                name="Usuarios"
+                component={Users}
                 options={{
                   tabBarIcon: ({ color, size }) => (
                     <FontAwesome5 name="user-friends" size={20} color={color} />
@@ -191,7 +195,7 @@ const PrivateRoutes = () => {
               />
               <Tab.Screen
                 name="Stories"
-                component={Home}
+                component={Status}
                 options={{
                   tabBarIcon: ({ color, size }) => (
                     <Zocial name="statusnet" size={20} color={color} />
@@ -253,7 +257,6 @@ const PrivateRoutes = () => {
           ),
         }}
       />
-
       <AppStack.Screen
         name="Contatos"
         component={Contatos}

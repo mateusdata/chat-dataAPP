@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 export const Context = createContext();
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, StatusBar, Text, View } from "react-native";
+import LoadingComponent from "../components/loading/loading";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(false);
@@ -10,8 +11,10 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [listUser, setListUser] = useState([]);
   const [currentTalk, setCurrentTalk] = useState("");
-  const [nameFriend, setNameFriend] = useState("Usuario");
+  const [nameFriend, setNameFriend] = useState("");
+  const [emailFriend, setEmailFriend] = useState("");
   const [isMenu, setIsMenu] = useState(false);
+  const [myData, setMydata]= useState("")
   useEffect(() => {
     AsyncStorage.getItem("usuarios")
       .then((response) => {
@@ -45,31 +48,22 @@ const AuthProvider = ({ children }) => {
 
   const sair = async () => {
     setLoading(true);
+    AsyncStorage.removeItem("contacsLocal");
+    AsyncStorage.removeItem("myData");
+    setListUser("");
     await AsyncStorage.removeItem("usuarios").then((response) => {
+      setUser(false);
       setTimeout(() => {
         setLoading(false);
       }, 600);
+      
     });
-    setUser(false);
+   
   };
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#1F2C34",
-        }}
-      >
-        <StatusBar
-          translucent={false}
-          backgroundColor="#1F2C34"
-          barStyle="dark-content"
-        />
-        <ActivityIndicator animating={true} color={"green"} size={"100%"} />
-      </View>
+      <LoadingComponent/>
     );
   }
   return (
@@ -90,6 +84,9 @@ const AuthProvider = ({ children }) => {
         setNameFriend,
         isMenu,
         setIsMenu,
+        myData,
+        setMydata,
+        emailFriend, setEmailFriend
       }}
     >
       {children}
